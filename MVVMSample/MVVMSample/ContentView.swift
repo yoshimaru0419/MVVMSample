@@ -25,7 +25,10 @@ struct ContentView: View {
             HStack {
                 Button("CountUp", action: {vModel.countUp()})
                 Button("CountDown", action: {vModel.countDown()})
+                Button("Save Count", action: {vModel.save()})
+                Button("load", action: {vModel.load()})
             }
+            Text("UserDefaults Data=\(vModel.UserDefaultData)")
         }
         .padding()
     }
@@ -35,13 +38,16 @@ struct ContentView: View {
 class DataViewModel : ObservableObject {
     
     @Published var count: Int
+    @Published var UserDefaultData: Int = 0
     
     private var model: Data
+    private var repository: DataRepositoryProtocol
     private var cancellables = Set<AnyCancellable>()
     
     init() {
         self.model = Data()
         self.count = model.value
+        self.repository = DataRepository()
         createSubscribe()
     }
     
@@ -61,6 +67,14 @@ class DataViewModel : ObservableObject {
     
     func countDown() {
         model.decrement()
+    }
+    
+    func save() {
+        repository.saveData(value: model.value)
+    }
+    
+    func load() {
+        UserDefaultData = repository.fetchData()
     }
 
 }
